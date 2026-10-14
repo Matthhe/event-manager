@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EventHub — площадка мероприятий</title>
+  <link rel="stylesheet" href="./layout.css">
+  <link rel="stylesheet" href="./header-search-footer.css">
+  <link rel="stylesheet" href="./events-locations-reviews.css">
+  <link rel="stylesheet" href="./sidebar-admin.css">
+</head>
+<body>
+<div class="page">
+
+  <!-- M L -->
+  <header class="header block">
+    <a class="logo" href="#">EventHub</a>
+    <nav class="nav">
+      <ul class="nav__list">
+        <li><a href="#events">Мероприятия</a></li>
+        <li><a href="#locations">Площадки</a></li>
+        <li><a href="#history">Мои записи</a></li>
+        <li><a href="#notifications">Уведомления <span class="nav__count">2</span></a></li>
+      </ul>
+    </nav>
+    <div class="auth">
+      <a class="btn btn--light" href="#">Войти</a>
+      <a class="btn" href="#">Регистрация</a>
+    </div>
+  </header>
+
+  <!-- M L -->
+  <section class="search block">
+    <h1>Найдите мероприятие</h1>
+    <form class="search__form" action="#" method="get">
+      <label class="field">Название
+        <input type="text" name="name" placeholder="Например, Митап по Java">
+      </label>
+      <label class="field">Дата начала от
+        <input type="date" name="dateStartAfter">
+      </label>
+      <label class="field">Цена до, BYN
+        <input type="number" name="costMax" min="0" placeholder="0">
+      </label>
+      <label class="field">Площадка
+        <select name="locationId">
+          <option value="">Любая</option>
+          <option value="1">Конференц-зал</option>
+          <option value="2">Коворкинг «Центр»</option>
+          <option value="3">Актовый зал</option>
+        </select>
+      </label>
+      <label class="field">Статус
+        <select name="status">
+          <option value="">Любой</option>
+          <option value="WAIT_START">Ожидает начала</option>
+          <option value="STARTED">Идёт</option>
+          <option value="FINISHED">Завершено</option>
+          <option value="CANCELLED">Отменено</option>
+        </select>
+      </label>
+      <label class="field">Мест не меньше
+        <input type="number" name="placeMin" min="5" placeholder="5">
+      </label>
+      <label class="field">Длительность от, мин
+        <input type="number" name="durationMin" min="10" placeholder="10">
+      </label>
+      <button class="btn search__submit" type="submit">Найти</button>
+    </form>
+  </section>
+
+  <!-- ================= УЧАСТНИК 2: МЕРОПРИЯТИЯ ================= -->
+  <section class="events block" id="events">
+    <h2>Мероприятия</h2>
+    <div class="events__grid">
+
+      <article class="event card">
+        <div class="event__head">
+          <h3 class="event__title">Митап по Java</h3>
+          <span class="badge badge--ok">Ожидает начала</span>
+        </div>
+        <p class="event__desc">Доклады о Spring Boot и практика. Подходит для начинающих.</p>
+        <div class="event__meta">
+          <span>📅 15.11.2026, 19:00</span>
+          <span>⏱ 120 мин</span>
+          <span>📍 Конференц-зал</span>
+          <span>💶 Бесплатно</span>
+          <span>👥 Мест: 49 из 50</span>
+        </div>
+        <div class="event__actions">
+          <button class="btn" type="button">Записаться</button>
+        </div>
+      </article>
+
+      <article class="event card">
+        <div class="event__head">
+          <h3 class="event__title">Воркшоп по CSS Grid</h3>
+          <span class="badge badge--warn">Мест нет</span>
+        </div>
+        <p class="event__desc">Практическая верстка. Свободных мест нет — можно встать в список ожидания.</p>
+        <div class="event__meta">
+          <span>📅 18.11.2026, 18:00</span>
+          <span>⏱ 90 мин</span>
+          <span>📍 Коворкинг «Центр»</span>
+          <span>💶 10 BYN</span>
+          <span>👥 Мест: 20 из 20</span>
+          <span>⏳ В списке ожидания: 4</span>
+        </div>
+        <div class="event__actions">
+          <button class="btn btn--wait" type="button">В список ожидания</button>
+        </div>
+      </article>
+
+      <article class="event card">
+        <div class="event__head">
+          <h3 class="event__title">Вечер настольных игр</h3>
+          <span class="badge badge--ok">Вы записаны</span>
+        </div>
+        <p class="event__desc">Неформальная встреча, игры и общение. Отмена записи доступна до начала.</p>
+        <div class="event__meta">
+          <span>📅 20.11.2026, 20:00</span>
+          <span>⏱ 180 мин</span>
+          <span>📍 Актовый зал</span>
+          <span>💶 5 BYN</span>
+          <span>👥 Мест: 12 из 30</span>
+        </div>
+        <div class="event__actions">
+          <button class="btn btn--danger" type="button">Отменить запись</button>
+        </div>
+      </article>
+
+      <article class="event card">
+        <div class="event__head">
+          <h3 class="event__title">Хакатон</h3>
+          <span class="badge">Идёт</span>
+        </div>
+        <p class="event__desc">Соревнование команд. Запись закрыта — мероприятие уже началось.</p>
+        <div class="event__meta">
+          <span>📅 14.10.2026, 10:00</span>
+          <span>⏱ 600 мин</span>
+          <span>📍 Конференц-зал</span>
+          <span>💶 Бесплатно</span>
+          <span>👥 Мест: 40 из 40</span>
+        </div>
+        <div class="event__actions">
+          <button class="btn" type="button" disabled>Запись закрыта</button>
+        </div>
+      </article>
+
+      <article class="event card">
+        <div class="event__head">
+          <h3 class="event__title">Лекция по Spring Security</h3>
+          <span class="badge badge--bad">Отменено</span>
+        </div>
+        <p class="event__desc">Мероприятие отменено владельцем. Участники получили уведомление.</p>
+        <div class="event__meta">
+          <span>📅 10.11.2026, 17:00</span>
+          <span>⏱ 60 мин</span>
+          <span>📍 Актовый зал</span>
+          <span>💶 Бесплатно</span>
+          <span>👥 Мест: 0 из 25</span>
+        </div>
+        <div class="event__actions">
+          <button class="btn" type="button" disabled>Недоступно</button>
+        </div>
+      </article>
+
+      <article class="event card">
+        <div class="event__head">
+          <h3 class="event__title">Мастер-класс по Git</h3>
+          <span class="badge badge--warn">Ждёт подтверждения админа</span>
+        </div>
+        <p class="event__desc">Заявка на создание отправлена. Появится в каталоге после подтверждения.</p>
+        <div class="event__meta">
+          <span>📅 25.11.2026, 16:00</span>
+          <span>⏱ 120 мин</span>
+          <span>📍 Коворкинг «Центр»</span>
+          <span>💶 Бесплатно</span>
+          <span>👥 Мест: 0 из 15</span>
+        </div>
+        <div class="event__actions">
+          <button class="btn" type="button" disabled>Ожидает подтверждения</button>
+        </div>
+      </article>
+
+    </div>
+    <nav class="pagination" aria-label="Страницы">
+      <a href="#">1</a><a href="#">2</a><a href="#">3</a><a href="#">→</a>
+    </nav>
+  </section>
+
+  <!-- ================= УЧАСТНИК 2: ПЛОЩАДКИ ================= -->
+  <section class="locations block" id="locations">
+    <h2>Площадки</h2>
+    <div class="locations__list">
+      <article class="location card">
+        <h3 class="location__name">Конференц-зал</h3>
+        <p>ул. Ленина, 1</p>
+        <p>Вместимость: 100 мест</p>
+        <p>Проектор, звук, Wi-Fi.</p>
+      </article>
+      <article class="location card">
+        <h3 class="location__name">Коворкинг «Центр»</h3>
+        <p>пр. Мира, 15</p>
+        <p>Вместимость: 40 мест</p>
+        <p>Столы, флипчарты.</p>
+      </article>
+      <article class="location card">
+        <h3 class="location__name">Актовый зал</h3>
+        <p>ул. Школьная, 7</p>
+        <p>Вместимость: 150 мест</p>
+        <p>Сцена, кресла.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= УЧАСТНИК 2: РЕЙТИНГ И КОММЕНТАРИИ ================= -->
+  <section class="reviews block" id="reviews">
+    <div class="reviews__top">
+      <h2>Рейтинг и комментарии</h2>
+      <span class="reviews__rating">★ 4.6 / 5</span>
+    </div>
+    <div class="reviews__list">
+      <article class="review card">
+        <p class="review__stars">★★★★★</p>
+        <p>Отличный митап, много практики!</p>
+        <p class="review__author">Борис · Митап по Java</p>
+      </article>
+      <article class="review card">
+        <p class="review__stars">★★★★☆</p>
+        <p>Интересно, но было тесновато.</p>
+        <p class="review__author">Анна · Вечер настольных игр</p>
+      </article>
+      <article class="review card">
+        <p class="review__stars">★★★★★</p>
+        <p>Организаторы быстро сообщили о переносе времени.</p>
+        <p class="review__author">Мария · Воркшоп по CSS Grid</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= УЧАСТНИК 3: БОКОВАЯ ПАНЕЛЬ ================= -->
+  <aside class="sidebar">
+
+    <section class="notifications block" id="notifications">
+      <h2>Уведомления</h2>
+      <ul>
+        <li class="notif notif--unread">
+          <span>Митап по Java: время начала изменилось</span>
+          <span class="badge badge--warn">Изменено</span>
+          <span class="notif__change">начало: 19:00 → 20:00</span>
+        </li>
+        <li class="notif notif--unread">
+          <span>Лекция по Spring Security отменена</span>
+          <span class="badge badge--bad">Отмена</span>
+        </li>
+        <li class="notif">
+          <span>Освободилось место на «Воркшоп по CSS Grid»</span>
+          <span class="badge badge--ok">Лист ожидания</span>
+        </li>
+      </ul>
+      <button class="btn notifications__read" type="button">Отметить прочитанными</button>
+    </section>
+
+    <section class="history block" id="history">
+      <h2>Моя история</h2>
+      <ul>
+        <li class="history__item">
+          <span>Вечер настольных игр</span>
+          <span class="badge badge--ok">Записан</span>
+          <span class="history__date">20.11.2026</span>
+        </li>
+        <li class="history__item">
+          <span>Воркшоп по CSS Grid</span>
+          <span class="badge badge--warn">В списке ожидания</span>
+          <span class="history__date">18.11.2026</span>
+        </li>
+        <li class="history__item">
+          <span>Конференция по Docker</span>
+          <span class="badge">Посетил</span>
+          <span class="history__date">02.10.2026</span>
+        </li>
+        <li class="history__item">
+          <span>Лекция по Spring Security</span>
+          <span class="badge badge--bad">Отменено</span>
+          <span class="history__date">10.11.2026</span>
+        </li>
+      </ul>
+    </section>
+
+  </aside>
+
+  <!-- ================= УЧАСТНИК 3: ПАНЕЛЬ АДМИНИСТРАТОРА ================= -->
+  <section class="admin block" id="admin">
+    <h2>Панель администратора</h2>
+    <ul>
+      <li class="admin__item">
+        <div>
+          <strong>Мастер-класс по Git</strong><br>
+          <span class="admin__type">Создание · владелец: Анна</span>
+        </div>
+        <div class="admin__buttons">
+          <button class="btn" type="button">Подтвердить</button>
+          <button class="btn btn--danger" type="button">Отклонить</button>
+        </div>
+      </li>
+      <li class="admin__item">
+        <div>
+          <strong>Хакатон</strong><br>
+          <span class="admin__type">Отмена · владелец: Борис</span>
+        </div>
+        <div class="admin__buttons">
+          <button class="btn" type="button">Подтвердить</button>
+          <button class="btn btn--danger" type="button">Отклонить</button>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- M L -->
+  <footer class="footer block">
+    <div>
+      <h3 class="footer__title">EventHub</h3>
+      <p>Площадка регистрации и проведения мероприятий.</p>
+    </div>
+    <div>
+      <h3 class="footer__title">Разделы</h3>
+      <ul>
+        <li><a href="#events">Мероприятия</a></li>
+        <li><a href="#locations">Площадки</a></li>
+        <li><a href="#reviews">Отзывы</a></li>
+      </ul>
+    </div>
+    <div>
+      <h3 class="footer__title">Контакты</h3>
+      <p>support@eventhub.com</p>
+      <p>© 2026 EventHub</p>
+    </div>
+  </footer>
+
+</div>
+</body>
+</html>

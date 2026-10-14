@@ -1,0 +1,129 @@
+/* =====================================================
+   layout.css — ОБЩИЙ файл (пишется втроём)
+   Здесь: переменные, сброс, общий каркас страницы (Grid)
+   и общий переход на телефон (Flexbox).
+   Каждый участник отвечает за свои строки (см. комментарии).
+   ===================================================== */
+
+/* ---- общие переменные и сброс ---- */
+:root {
+  --c-bg: #f4f5f7;
+  --c-card: #ffffff;
+  --c-border: #d0d4da;
+  --c-primary: #2563eb;
+  --c-text: #1f2937;
+  --c-muted: #6b7280;
+  --c-ok: #15803d;
+  --c-warn: #b45309;
+  --c-bad: #b91c1c;
+  --gap: 16px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--c-bg);
+  color: var(--c-text);
+  line-height: 1.4;
+}
+
+ul { list-style: none; }
+a { color: var(--c-primary); text-decoration: none; }
+h1, h2, h3 { margin-bottom: 8px; }
+
+/* ---- общие элементы: карточка и кнопка ---- */
+.card, .block {
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  padding: var(--gap);
+}
+
+.btn {
+  display: inline-block;
+  padding: 8px 14px;
+  border: 1px solid var(--c-primary);
+  border-radius: 6px;
+  background: var(--c-primary);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+.btn--light  { background: #fff; color: var(--c-primary); }
+.btn--danger { background: var(--c-bad); border-color: var(--c-bad); }
+.btn--wait   { background: var(--c-warn); border-color: var(--c-warn); }
+.btn[disabled] { background: #e5e7eb; border-color: #e5e7eb; color: var(--c-muted); cursor: not-allowed; }
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  background: #e5e7eb;
+}
+.badge--ok   { background: #dcfce7; color: var(--c-ok); }
+.badge--warn { background: #fef3c7; color: var(--c-warn); }
+.badge--bad  { background: #fee2e2; color: var(--c-bad); }
+
+/* =====================================================
+   ГЛАВНЫЙ GRID страницы — компьютер (от 1024px)
+   Участник 1: grid-template-columns, gap, max-width
+   Участник 2: grid-template-areas для events / locations / reviews
+   Участник 3: grid-template-areas для sidebar / admin
+   ===================================================== */
+.page {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  grid-template-areas:
+    "header    header"
+    "search    search"
+    "events    sidebar"
+    "locations sidebar"
+    "reviews   admin"
+    "footer    footer";
+  gap: var(--gap);
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--gap);
+}
+
+/* =====================================================
+   ПЛАНШЕТ (768px – 1023px) — по-прежнему Grid, но другие areas
+   ===================================================== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .page {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "header    header"
+      "search    search"
+      "events    events"
+      "sidebar   admin"
+      "locations locations"
+      "reviews   reviews"
+      "footer    footer";
+  }
+}
+
+/* =====================================================
+   ТЕЛЕФОН (до 767px) — переходим на FlexBox
+   Порядок блоков задаётся свойством order
+   ===================================================== */
+@media (max-width: 767px) {
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 10px;
+  }
+  /* order: Участник 1 — header, search, footer; Участник 2 — events, locations, reviews; Участник 3 — sidebar, admin */
+  .header    { order: 1; }
+  .search    { order: 2; }
+  .events    { order: 3; }
+  .sidebar   { order: 4; }
+  .locations { order: 5; }
+  .reviews   { order: 6; }
+  .admin     { order: 7; }
+  .footer    { order: 8; }
+}

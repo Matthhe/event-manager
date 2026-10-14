@@ -1,0 +1,56 @@
+/* =====================================================
+   sidebar-admin.css — УЧАСТНИК 3
+   Блоки: боковая панель (.sidebar: уведомления + история) и панель администратора (.admin)
+   Каждый блок: Grid для ПК/планшета + Flexbox и media для телефона
+   ===================================================== */
+
+/* ---------- БОКОВАЯ ПАНЕЛЬ: Grid ---------- */
+.sidebar {
+  grid-area: sidebar;
+  display: grid;
+  grid-template-rows: auto auto;   /* уведомления сверху, история снизу */
+  gap: var(--gap);
+}
+
+/* уведомления */
+.notif { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; padding: 8px 0; border-bottom: 1px solid var(--c-border); font-size: 14px; }
+.notif--unread { font-weight: bold; }
+.notif__change { grid-column: 1 / -1; color: var(--c-muted); font-weight: normal; font-size: 13px; }
+.notifications__read { margin-top: 10px; }
+
+/* история */
+.history__item { display: grid; grid-template-columns: 1fr auto; gap: 4px 8px; padding: 8px 0; border-bottom: 1px solid var(--c-border); font-size: 14px; }
+.history__date { color: var(--c-muted); font-size: 13px; }
+
+/* ---------- ПАНЕЛЬ АДМИНИСТРАТОРА: Grid ---------- */
+.admin { grid-area: admin; }
+.admin__item {
+  display: grid;
+  grid-template-columns: 1fr auto;    /* текст | кнопки */
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--c-border);
+  font-size: 14px;
+}
+.admin__buttons { display: grid; grid-auto-flow: column; gap: 6px; }
+.admin__type { font-size: 12px; color: var(--c-muted); }
+
+/* ---------- ПЛАНШЕТ: Grid ---------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .sidebar { grid-template-columns: 1fr; }   /* на планшете sidebar и admin стоят рядом (areas в layout.css) */
+  .admin__item { grid-template-columns: 1fr; }
+  .admin__buttons { justify-self: start; }
+}
+
+/* ---------- ТЕЛЕФОН: Flexbox ---------- */
+@media (max-width: 767px) {
+  .sidebar { display: flex; flex-direction: column; gap: 12px; }
+
+  .notif { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 8px; }
+  .history__item { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 8px; }
+
+  .admin__item { display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+  .admin__buttons { display: flex; gap: 8px; }
+  .admin__buttons .btn { flex: 1; text-align: center; }
+}

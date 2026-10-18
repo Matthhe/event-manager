@@ -1,0 +1,67 @@
+/* =====================================================
+   events-locations-reviews.css — Касянович Матвей Павлович
+   Блоки: мероприятия (.events), площадки (.locations), рейтинг и комментарии (.reviews)
+   Каждый блок: Grid для ПК/планшета + Flexbox и media для телефона
+   ===================================================== */
+
+/* ---------- МЕРОПРИЯТИЯ: Grid ---------- */
+.events { grid-area: events; }
+.events__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);   /* карточки по 2 в ряд */
+  gap: var(--gap);
+  margin: 12px 0;
+}
+.event { display: grid; gap: 8px; align-content: start; }
+.event__head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.event__title { margin: 0; font-size: 17px; }
+.event__desc { font-size: 14px; color: var(--c-muted); }
+.event__meta { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 14px; }
+.event__actions { display: grid; grid-auto-flow: column; gap: 8px; }
+.pagination { display: grid; grid-auto-flow: column; justify-content: center; gap: 6px; }
+.pagination a { padding: 4px 10px; border: 1px solid var(--c-border); border-radius: 4px; background: #fff; }
+
+/* ---------- ПЛОЩАДКИ: Grid ---------- */
+.locations { grid-area: locations; }
+.locations__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+  margin-top: 12px;
+}
+.location { font-size: 14px; }
+.location__name { margin-bottom: 4px; font-size: 16px; }
+
+/* ---------- РЕЙТИНГ И КОММЕНТАРИИ: Grid ---------- */
+.reviews { grid-area: reviews; }
+.reviews__top { display: grid; grid-template-columns: 1fr auto; align-items: center; }
+.reviews__rating { font-size: 20px; color: var(--c-warn); font-weight: bold; }
+.reviews__list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+  margin-top: 12px;
+}
+.review { font-size: 14px; }
+.review__stars { color: var(--c-warn); }
+.review__author { color: var(--c-muted); font-size: 12px; }
+
+/* ---------- ПЛАНШЕТ: Grid с другим числом колонок ---------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .locations__list { grid-template-columns: repeat(3, 1fr); }
+  .reviews__list   { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- ТЕЛЕФОН: Flexbox ---------- */
+@media (max-width: 767px) {
+  .events__grid { display: flex; flex-direction: column; gap: 12px; }
+  .event { display: flex; flex-direction: column; gap: 8px; }
+  .event__meta { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .event__actions { display: flex; flex-direction: column; gap: 8px; }
+  .pagination { display: flex; flex-wrap: wrap; justify-content: center; }
+
+  .locations__list { display: flex; flex-direction: column; gap: 12px; }
+
+  .reviews__top { display: flex; justify-content: space-between; align-items: center; }
+  .reviews__list { display: flex; flex-direction: column; gap: 12px; }
+}

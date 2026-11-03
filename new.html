@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Веб-Дозор: Симулятор блокировщика рекламы</title>
+<style>
+body{margin:0;font:14px sans-serif;background:#eee;color:#222}
+body.dark{background:#111;color:#eee}
+body.danger #bar{animation:b .6s infinite}
+#bar{padding:8px;background:#8883}
+#info{padding:4px 8px;font-size:12px;background:#8881}
+#field{position:relative;height:calc(100vh - 95px);overflow:hidden}
+body.anon #hello{opacity:.5}
+body.named #hello{color:green}
+.ad{position:absolute;width:220px;background:#fff;color:#222;border:2px solid #c00;padding:6px;opacity:0;transform:scale(.85);transition:opacity .3s,transform .3s}
+.ad.visible{opacity:1;transform:none}
+.ad h4{margin:0 0 4px}.ad p{margin:0 0 6px;font-size:12px}
+.toast.crit{animation:b .5s infinite}
+@keyframes b{50%{background:#fbb}}
+.video{width:120px;background:#000;color:#fff;transition:width 8s linear,height 8s linear}
+.video.big{width:600px;height:400px}
+.trojan{width:110px;border-style:dashed;cursor:grab;transition:top 8s linear,opacity .3s,transform .3s}
+#zone{position:absolute;right:10px;bottom:10px;width:160px;height:90px;border:3px dashed green;text-align:center;padding-top:30px;box-sizing:border-box}
+#captcha{position:absolute;inset:0;background:#000a;color:#fff;text-align:center;padding-top:20vh;z-index:9}
+#captcha span{font:bold 30px serif;display:inline-block;margin:4px}
+#captcha[hidden]{display:none}
+</style>
+</head>
+<body class="light anon">
+<div id="bar">
+  Имя: <input id="name" size="10"> Тема: <select id="theme"><option>light</option><option>dark</option></select>
+  | Оператор: <b id="hello"></b> | XP: <b id="xp"></b> | Трафик: <b id="traf"></b> МБ | Поймано: <b id="caught">0</b> <b id="vip"></b>
+</div>
+<div id="info"></div>
+<div id="field">
+  <div id="zone">Карантин</div>
+  <div id="captcha" hidden>
+    <p>Капча-атака! Введите код:</p><div id="code"></div>
+    <input id="cin"> <button id="cbtn">OK</button>
+  </div>
+</div>
+<script>
+const $ = s => document.querySelector(s), field = $('#field');
+let xp = +(sessionStorage.xp ?? 100), caught = 0, fast = 0, code = '', db;
+
+/* ===== IndexedDB: threat_logs, inventory, threats_db ===== */
+const req = indexedDB.open('dozor', 2);
+req.onupgradeneeded = () => {
+  const d = req.result;
+  if (!d.objectStoreNames.contains('threat_logs')) d.createObjectStore('threat_logs', { autoIncrement: true });
+  if (!d.objectStoreNames.contains('inventory')) d.createObjectStore('inventory', { keyPath: 'item' });
+  if (!d.objectStoreNames.contains('threats_db')) d.createObjectStore('threats_db', { keyPath: 'type' });
+};
+req.onsuccess = () => { db = req.result; showDB(); };
+function log(type, name) {                           // асинхронная запись пойманной угрозы
+  if (!db) return;
+  const tx = db.transaction(['threat_logs', 'inventory', 'threats_db'], 'readwrite');
+  tx.objectStore('threat_logs').add({ type, time: Date.now() });
+  const bump = (st, key, obj) => {
+    const s = tx.objectStore(st);
+    s.get(key).onsuccess = e => { const o = e.target.result || obj; o.count = (o.count || 0) + 1; s.put(o); };
+  };
+  bump('threats_db', type, { type });
+  if (type == 'trojan') bump('inventory', name, { item: name });
+  tx.oncomplete = showDB;
+}
+function showDB() {
+  const tx = db.transaction(['threat_logs', 'inventory', 'threats_db']);
+  const out = {};
+  tx.objectStore('threat_logs').count().onsuccess = e => out.total = e.target.result;
+  tx.objectStore('threats_db').getAll().onsuccess = e => out.threats = e.target.result;
+  tx.objectStore('inventory').getAll().onsuccess = e => out.inv = e.target.result;
+  tx.oncomplete = () => $('#info').textContent =
+    `Логов: ${out.total} | База угроз: ` + (out.threats.map(t => `${t.type}×${t.count}`).join(', ') || '—') +
+    ` | Инвентарь: ` + (out.inv.map(i => `${i.item}×${i.count}`).join(', ') || '—');
+}
+
+/* ===== sessionStorage: XP и трафик ===== */
+function draw() {
+  $('#xp').textContent = xp;
+  $('#traf').textContent = +sessionStorage.traf || 0;
+  $('#caught').textContent = caught;
+  $('#vip').textContent = document.cookie.includes('vip=1') ? 'VIP' : '';
+  document.body.classList.toggle('danger', xp <= 30);
+}
+function hit(n) {
+  xp = Math.max(0, xp - n); sessionStorage.xp = xp; draw();
+  if (xp == 0) field.innerHTML = '<h1>Система заражена</h1><button onclick="sessionStorage.clear();location.reload()">Заново</button>';
+}
+function kill(ad) {
+  ad.classList.remove('visible'); setTimeout(() => ad.remove(), 300);
+  ad.dataset.done = 1; caught++;
+  log(ad.classList[1], ad.dataset.name);
+  if (caught % 5 == 0) document.cookie = 'vip=1;max-age=300';   // Cookie: VIP на 5 минут
+  draw();
+}
+
+/* ===== localStorage: имя и тема → классы на <body> ===== */
+function applySettings() {
+  const b = document.body.classList, name = localStorage.name || '';
+  b.remove('light', 'dark', 'named', 'anon');
+  b.add(localStorage.theme || 'light', name ? 'named' : 'anon');
+  $('#theme').value = localStorage.theme || 'light';
+  $('#name').value = name;
+  $('#hello').textContent = name || 'Аноним';
+}
+$('#theme').onchange = e => { localStorage.theme = e.target.value; applySettings(); };
+$('#name').oninput = e => { localStorage.name = e.target.value.trim(); applySettings(); };
+
+/* ===== Динамическая генерация баннеров ===== */
+function spawn() {
+  if (xp == 0) return;
+  const t = ['popup', 'toast', 'video', 'trojan'][Math.random() * 4 | 0], d = document.createElement('div');
+  d.className = 'ad ' + t;
+  d.style.left = Math.random() * (field.clientWidth - 240) + 'px';
+  d.style.top = Math.random() * (field.clientHeight - 250) + 'px';
+  const real = Math.random() < .5;
+  d.innerHTML = {
+    popup: `<h4>Вы выиграли iPhone!</h4><p>Нажмите, чтобы забрать приз прямо сейчас.</p>
+            <button data-a="${real ? 'x' : 'fake'}">✕</button>
+            <button data-a="fake">Скачать бесплатно</button>${real ? '' : ' <button data-a="x" style="font-size:8px">x</button>'}`,
+    toast: `<h4>Уведомление браузера</h4><p>Сайт хочет отправлять вам уведомления.</p>
+            <button data-a="x">Блокировать</button> <button data-a="allow">Разрешить</button>`,
+    video: `<h4>▶ Реклама</h4><p>Видео сейчас развернётся на весь экран.</p><button data-a="x">✕</button>`,
+    trojan: `<h4>📄 ${(d.dataset.name = ['config.sys', 'invoice.zip', 'update.dll'][Math.random() * 3 | 0])}</h4><p>Заражённый файл</p>`
+  }[t];
+  if (t == 'toast') {                                // уведомления — в углах экрана
+    const c = Math.random() * 4 | 0;
+    d.style.left = c & 1 ? field.clientWidth - 240 + 'px' : '10px';
+    d.style.top = c & 2 ? field.clientHeight - (c == 3 ? 190 : 90) + 'px' : '10px';
+    if (Math.random() < .4) d.classList.add('crit');
+  }
+  if (t == 'trojan') { d.id = 't' + Date.now(); d.draggable = true; d.style.top = '0'; }
+  field.append(d);
+  setTimeout(() => {
+    d.classList.add('visible');
+    if (t == 'video') d.classList.add('big');
+    if (t == 'trojan') d.style.top = field.clientHeight - 80 + 'px';
+  }, 50);
+  setTimeout(() => {                                 // не успели — штраф
+    if (d.isConnected && !d.dataset.done) { d.remove(); hit(t == 'video' ? 20 : t == 'trojan' ? 15 : 5); }
+  }, t == 'popup' || t == 'toast' ? 10000 : 8000);
+  let delay = 2000;
+  if (Date.now() < fast) delay /= 2;                 // «Разрешить» ускоряет рекламу вдвое
+  if (document.cookie.includes('vip=1')) delay *= 1.5;
+  setTimeout(spawn, delay);
+}
+
+/* ===== Делегирование событий на контейнере ===== */
+field.onclick = e => {
+  const ad = e.target.closest('.ad');
+  if (!ad || ad.dataset.done || !$('#captcha').hidden) return;   // мимо баннера / капча активна
+  const a = e.target.dataset.a;
+  if (a == 'x') kill(ad);                                        // честный крестик / «Блокировать»
+  else if (a == 'allow') { fast = Date.now() + 15000; ad.remove(); }
+  else hit(a == 'fake' ? 10 : 5);                                // фальшивая кнопка или тело баннера
+};
+field.ondragstart = e => $('#captcha').hidden ? e.dataTransfer.setData('id', e.target.id) : e.preventDefault();
+field.ondragover = e => e.preventDefault();
+field.ondrop = e => {
+  const t = document.getElementById(e.dataTransfer.getData('id'));
+  if (t && !t.dataset.done && e.target.closest('#zone')) kill(t);   // карантин
+};
+
+/* ===== Капча-атака раз в минуту ===== */
+setInterval(() => {
+  if (xp == 0) return;
+  code = Math.random().toString(36).slice(2, 7).toUpperCase();
+  $('#code').replaceChildren(...[...code].map(c => Object.assign(document.createElement('span'), { textContent: c })));
+  $('#cin').value = ''; $('#captcha').hidden = false;
+}, 60000);
+$('#cbtn').onclick = () => { if ($('#cin').value.toUpperCase() == code) $('#captcha').hidden = true; else hit(5); };
+
+/* ===== Трафик: при капче растёт быстрее ===== */
+setInterval(() => { sessionStorage.traf = (+sessionStorage.traf || 0) + ($('#captcha').hidden ? 1 : 20); draw(); }, 1000);
+
+applySettings(); draw();
+setTimeout(spawn, 300);
+</script>
+</body>
+</html>

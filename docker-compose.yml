@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: eventhub
+      POSTGRES_USER: eventhub
+      POSTGRES_PASSWORD: eventhub
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/db/schema.sql:/docker-entrypoint-initdb.d/01_schema.sql
+      - ./backend/db/seed.sql:/docker-entrypoint-initdb.d/02_seed.sql
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  api:
+    build: ./backend
+    ports:
+      - "8081:80"
+    environment:
+      DB_HOST: db
+      DB_NAME: eventhub
+      DB_USER: eventhub
+      DB_PASS: eventhub
+      REDIS_HOST: redis
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+      - redis
+
+  scheduler:
+    build: ./backend
+    command: sh -c "while true; do php /var/www/html/bin/update-statuses.php; sleep 60; done"
+    environment:
+      DB_HOST: db
+      DB_NAME: eventhub
+      DB_USER: eventhub
+      DB_PASS: eventhub
+      REDIS_HOST: redis
+    volumes:
+      - ./backend:/var/www/html
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  pgdata:

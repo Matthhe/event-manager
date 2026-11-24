@@ -1,0 +1,70 @@
+/* =====================================================
+   header-search-footer.css — УЧАСТНИК 1
+   Блоки: шапка (.header), поиск мероприятий (.search), подвал (.footer)
+   Каждый блок: Grid для ПК/планшета + Flexbox и media для телефона
+   ===================================================== */
+
+/* ---------- ШАПКА: Grid ---------- */
+.header {
+  grid-area: header;
+  display: grid;
+  grid-template-columns: 200px 1fr auto;   /* логотип | меню | вход */
+  align-items: center;
+  gap: var(--gap);
+}
+.logo { font-size: 22px; font-weight: bold; color: var(--c-primary); }
+.nav__list { display: grid; grid-auto-flow: column; justify-content: start; gap: 20px; }
+.auth { display: grid; grid-auto-flow: column; gap: 8px; }
+.nav__count { background: var(--c-bad); color: #fff; border-radius: 10px; padding: 0 6px; font-size: 12px; }
+
+/* ---------- ПОИСК: Grid ---------- */
+.search { grid-area: search; }
+.search__form {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);   /* 4 поля в ряд */
+  gap: 12px;
+  margin-top: 12px;
+}
+.field { display: grid; gap: 4px; font-size: 13px; }
+.field input, .field select {
+  padding: 8px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  font-size: 14px;
+}
+.search__submit { grid-column: 1 / -1; justify-self: start; }  /* кнопка на всю строку, слева */
+
+/* ---------- ПОДВАЛ: Grid ---------- */
+.footer {
+  grid-area: footer;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gap);
+  font-size: 14px;
+}
+.footer__title { font-size: 15px; }
+
+/* ---------- ПЛАНШЕТ: Grid с другим числом колонок ---------- */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .search__form { grid-template-columns: repeat(2, 1fr); }
+  .header { grid-template-columns: 160px 1fr; }
+  .auth { grid-column: 1 / -1; justify-self: end; }
+}
+
+/* ---------- ТЕЛЕФОН: Flexbox ---------- */
+@media (max-width: 767px) {
+  .header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .nav__list { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+  .auth { display: flex; gap: 8px; }
+  .auth .btn { flex: 1; text-align: center; }
+
+  .search__form { display: flex; flex-direction: column; gap: 10px; }
+  .search__submit { width: 100%; }
+
+  .footer { display: flex; flex-direction: column; gap: 12px; }
+}

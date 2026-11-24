@@ -1,0 +1,57 @@
+/* =====================================================
+   app.css — стили для элементов, которых не было в макете
+   (страницы входа/формы, сообщения, пагинация-кнопки)
+   ===================================================== */
+
+/* Отдельные страницы (вход, описание мероприятия, форма) занимают всю ширину Grid между шапкой и подвалом */
+.view { grid-column: 1 / -1; grid-row: 2 / 6; display: grid; gap: 12px; align-content: start; }
+.form-page { max-width: 560px; width: 100%; justify-self: center; }
+
+.form { display: grid; gap: 12px; }
+.field textarea {
+  padding: 8px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.muted { color: var(--c-muted); font-size: 14px; font-weight: normal; }
+.mt { margin-top: 12px; }
+
+.msg { padding: 8px 10px; border-radius: 6px; font-size: 14px; }
+.msg--ok    { background: #dcfce7; color: var(--c-ok); }
+.msg--warn  { background: #fef3c7; color: var(--c-warn); }
+.msg--error { background: #fee2e2; color: var(--c-bad); }
+
+.search__buttons { display: grid; grid-auto-flow: column; gap: 8px; }
+
+.pagination button {
+  padding: 4px 10px;
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+.pagination button.active { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+
+.auth { align-items: center; }
+.auth__name { font-size: 14px; color: var(--c-muted); }
+button.btn { font-family: inherit; }
+
+.event-page__top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.event-page__manage { display: flex; gap: 8px; flex-wrap: wrap; }
+.waitlist ol { padding-left: 20px; }
+
+.history__review { margin-left: 8px; font-size: 12px; }
+.admin__filter { max-width: 220px; margin-bottom: 8px; }
+.admin__comment { padding: 6px; border: 1px solid var(--c-border); border-radius: 6px; font-size: 13px; }
+
+.link-btn { background: none; border: none; color: var(--c-bad); cursor: pointer; font-size: 12px; padding: 0; }
+
+@media (max-width: 767px) {
+  .page > * { align-self: stretch; } /* на телефоне все блоки во всю ширину */
+  .view { order: 2; }
+  .search__buttons { display: flex; flex-direction: column; }
+}
